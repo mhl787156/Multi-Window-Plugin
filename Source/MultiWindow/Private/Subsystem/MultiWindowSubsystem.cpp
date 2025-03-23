@@ -35,15 +35,57 @@ void UMultiWindowSubsystem::Deinitialize()
 	{
 		KVP.Value->Shutdown();
 	}
-	
+
 	Super::Deinitialize();
 }
 
-UMW_Window* UMultiWindowSubsystem::CreateMultiWindow(UObject* WorldContextObject, TSoftClassPtr<UUserWidget> WidgetClass, FName InTitle, EMultiWidgetDependencyType DependencyType, FVector2D WindowPosition, FVector2D WindowSize, UObject* DependencyObject, EBPSizingRule SizingRule, bool bSupportsMaximize, bool bSupportsMinimize)
+UMW_Window* UMultiWindowSubsystem::CreateMultiWindow(UObject* WorldContextObject,
+													TSoftClassPtr<UUserWidget> WidgetClass,
+													FName InTitle,
+													EMultiWidgetDependencyType DependencyType,
+													FVector2D WindowPosition,
+													FVector2D WindowSize,
+													UObject* DependencyObject,
+													EBPSizingRule SizingRule,
+													bool bSupportsMaximize,
+													bool bSupportsMinimize,
+													bool bSaneWindowPlacement,
+													bool bCreateTitleBar,
+													bool bFocusWhenFirstShown,
+													bool bBorderlessWindow,
+													uint8 display_id,
+													bool bNativeAutoFullScreen,
+													bool bWindowPositionRelativeToDisplay)
 {
 	check(!WidgetClass.IsNull());
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert);
-	
+
+
+	// Get Monitor Information
+	FDisplayMetrics DisplayMetrics;
+	FSlateApplication::Get().GetDisplayMetrics(DisplayMetrics);
+
+	int32 NumMonitors = DisplayMetrics.MonitorInfo.Num();
+	if (NumMonitors < display_id)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Only %d monitors detected! Cannot position window %d"), NumMonitors, display_id);
+		return nullptr;
+	}
+	// Get the position of the second monitor
+	FMonitorInfo MonitorInfo= DisplayMetrics.MonitorInfo[display_id];  // Index 1 = Second Monitor
+
+	if(bNativeAutoFullScreen)
+	{
+		// Set Window Size to the size of the monitor
+		WindowSize = FVector2D(MonitorInfo.NativeWidth, MonitorInfo.NativeHeight);
+	}
+
+	if(bWindowPositionRelativeToDisplay)
+	{
+		// Set Window Position to be relative to the window work area
+		WindowPosition = FVector2D(MonitorInfo.WorkArea.Left, MonitorInfo.WorkArea.Top) + WindowPosition;
+	}
+
 	UMW_Window* NewWindow = NewObject<UMW_Window>(&Get(), UMW_Window::StaticClass());
 	NewWindow->WindowTitle = InTitle;
 	NewWindow->WindowPosition = WindowPosition;
@@ -53,8 +95,13 @@ UMW_Window* UMultiWindowSubsystem::CreateMultiWindow(UObject* WorldContextObject
 	NewWindow->bSupportsMinimize = bSupportsMinimize;
 	NewWindow->DependencyType = DependencyType;
 	NewWindow->DependencyObject = DependencyObject;
+	NewWindow->bSaneWindowPlacement = bSaneWindowPlacement;
+	NewWindow->bCreateTitleBar = bCreateTitleBar;
+	NewWindow->bFocusWhenFirstShown = bFocusWhenFirstShown;
+	// NewWindow->AutoCenter = AutoCenter;
+	NewWindow->bBorderlessWindow = bBorderlessWindow;
 	NewWindow->Init();
-	
+
 	Get().ActiveWindows.Add(InTitle, NewWindow);
 
 	APlayerController* PC = World->GetFirstPlayerController();
@@ -62,7 +109,7 @@ UMW_Window* UMultiWindowSubsystem::CreateMultiWindow(UObject* WorldContextObject
 	{
 		AddWidgetToWindow(NewWindow, UserWidget);
 	}
-	
+
 	return NewWindow;
 }
 

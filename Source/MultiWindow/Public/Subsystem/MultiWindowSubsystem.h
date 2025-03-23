@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include "CoreMinimal.h"
 #include "Subsystems/EngineSubsystem.h"
+#include "Widgets/SWindow.h"
 #include "MultiWindowSubsystem.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMultiWindow, Verbose, Verbose);
@@ -70,7 +71,22 @@ public:
 
 	/* Creates a Multi Window and displays it*/
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, meta = (AdvancedDisplay = 4, WorldContext = WorldContextObject, BlueprintInternalUseOnly = true, MultiWindow), Category = "MultiWindow")
-	static UMW_Window* CreateMultiWindow(UObject* WorldContextObject, TSoftClassPtr<UUserWidget> WidgetClass, FName InTitle = "New Window", EMultiWidgetDependencyType DependencyType = EMultiWidgetDependencyType::World, FVector2D WindowPosition = FVector2D(0.0f, 0.0f), FVector2D WindowSize = FVector2D(800.0f, 600.0f), UObject* DependencyObject = nullptr, EBPSizingRule SizingRule = EBPSizingRule::UserSized, bool bSupportsMaximize = true, bool bSupportsMinimize = true);
+	static UMW_Window* CreateMultiWindow(UObject* WorldContextObject, TSoftClassPtr<UUserWidget> WidgetClass,
+										FName InTitle = "New Window",
+										EMultiWidgetDependencyType DependencyType = EMultiWidgetDependencyType::World,
+										FVector2D WindowPosition = FVector2D(0.0f, 0.0f),
+										FVector2D WindowSize = FVector2D(800.0f, 600.0f),
+										UObject* DependencyObject = nullptr,
+										EBPSizingRule SizingRule = EBPSizingRule::UserSized,
+										bool bSupportsMaximize = true, bool bSupportsMinimize = true,
+										bool bSaneWindowPlacement = false,
+										bool bCreateTitleBar = true,
+										bool bFocusWhenFirstShown = true,
+										bool bBorderlessWindow = false,
+										uint8 display_id = 0,
+										bool bNativeAutoFullScreen = true, // Overwrite Window Position and Window Size with Native Display Lookup'
+										bool bWindowPositionRelativeToDisplay = true
+										);
 
 	/* Tries to find an active window, and shuts it down */
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "MultiWindow", meta = (BlueprintInternalUseOnly = true, MultiWindow))
@@ -101,5 +117,5 @@ private:
 
 	UPROPERTY()
 	TMap<FName, TObjectPtr<UMW_Window>> ActiveWindows;
-	
+
 };

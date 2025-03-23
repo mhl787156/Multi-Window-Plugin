@@ -67,7 +67,12 @@ void UMW_Window::Init()
 		.WindowSize(WindowSize)
 		.SupportsMaximize(bSupportsMaximize)
 		.SupportsMinimize(bSupportsMinimize)
-		.SizingRool(Convert(SizingRule));
+		.SizingRool(Convert(SizingRule))
+		.SaneWindowPlacement(bSaneWindowPlacement)
+		.CreateTitleBar(bCreateTitleBar)  // Remove title bar
+        .FocusWhenFirstShown(bFocusWhenFirstShown)
+        .AutoCenter(AutoCenter)
+		.UseOSWindowBorder(bBorderlessWindow);
 
 	SlateWindow->GetOnWindowClosedEvent().AddWeakLambda(this, [this](const TSharedRef<SWindow>& Window)
 	{
@@ -81,7 +86,7 @@ void UMW_Window::Init()
 			UMultiWindowSubsystem::Get().ShutdownWindowByObjectReference(this);
 		});
 	}
-	
+
 	FSlateApplication::Get().AddWindow(SlateWindow.ToSharedRef());
 }
 
@@ -89,12 +94,12 @@ void UMW_Window::Shutdown(bool bForced)
 {
 	bCurrentlyShuttingDown = true;
 	DependencyObject = nullptr;
-	
+
 	if(bForced == false)
 	{
 		FSlateApplication::Get().RequestDestroyWindow(SlateWindow.ToSharedRef());
 	}
-	
+
 	if(UserWidget.IsValid())
 	{
 		UserWidget->RemoveFromParent();
@@ -111,7 +116,7 @@ void UMW_Window::AddWidgetToWindow(UUserWidget* InWidget)
 	{
 		/* Give the widget this as an outer so the slate window can release it's resources */
 		InWidget->Rename(nullptr, this);
-		
+
 		/* Needed something to wrap around the user widget */
 		const TSharedPtr<SWidget> WidgetWrapper = SNew(SBox)
 			.WidthOverride(WindowSize.X)

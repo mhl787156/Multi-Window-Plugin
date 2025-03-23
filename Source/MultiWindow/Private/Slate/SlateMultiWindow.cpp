@@ -34,6 +34,11 @@ void SMultiWindow::Construct(const FArguments& InArgs)
 		.SupportsMaximize(InArgs._SupportsMaximize)
 		.SupportsMinimize(InArgs._SupportsMinimize)
 		.SizingRule(InArgs._SizingRool)
+		.SaneWindowPlacement(InArgs._SaneWindowPlacement)
+		.CreateTitleBar(InArgs._CreateTitleBar)  // Remove title bar
+        .FocusWhenFirstShown(InArgs._FocusWhenFirstShown)
+        .AutoCenter(InArgs._AutoCenter)
+		.UseOSWindowBorder(InArgs._UseOSWindowBorder)  // Borderless window
 		[
 			// Add your UI widgets here
 			SNew(SVerticalBox)

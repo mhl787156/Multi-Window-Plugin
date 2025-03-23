@@ -36,6 +36,11 @@ class SMultiWindow final : public SWindow
 	SLATE_ARGUMENT(bool, SupportsMaximize);
 	SLATE_ARGUMENT(bool, SupportsMinimize);
 	SLATE_ARGUMENT(ESizingRule, SizingRool);
+	SLATE_ARGUMENT(bool, SaneWindowPlacement);
+	SLATE_ARGUMENT(bool, CreateTitleBar);
+	SLATE_ARGUMENT(bool, FocusWhenFirstShown);
+	SLATE_ARGUMENT(EAutoCenter, AutoCenter);
+	SLATE_ARGUMENT(bool, UseOSWindowBorder);
 	SLATE_END_ARGS();
 
 	void Construct(const FArguments& InArgs);

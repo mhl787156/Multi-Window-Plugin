@@ -28,10 +28,12 @@ SOFTWARE.
 #include "CoreMinimal.h"
 #include "Subsystem/MultiWindowSubsystem.h"
 #include "UObject/Object.h"
+#include "Widgets/SWindow.h"
 #include "MW_Window.generated.h"
 
 enum class EMultiWidgetDependencyType : uint8;
 enum class EBPSizingRule : uint8;
+enum class EBPAutoCenter: uint8;
 
 class SMultiWindow;
 /**
@@ -43,7 +45,7 @@ class MULTIWINDOW_API UMW_Window : public UObject, public FTickableGameObject
 	GENERATED_BODY()
 
 public:
-	
+
 	UMW_Window();
 
 
@@ -70,8 +72,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UObject* GetDependencyObject() const { return DependencyObject.Get(); }
-	
-	
+
+
 
 	//~ Begin FTickableGameObjectInterface
 	virtual bool IsTickable() const override { return true; }
@@ -96,6 +98,12 @@ public:
 	EBPSizingRule SizingRule;
 	bool bSupportsMaximize;
 	bool bSupportsMinimize;
+	bool bSaneWindowPlacement;
+	bool bCreateTitleBar;
+	bool bFocusWhenFirstShown;
+	EAutoCenter AutoCenter;
+	bool bBorderlessWindow;
+
 	EMultiWidgetDependencyType DependencyType;
 	TWeakObjectPtr<> DependencyObject;
 	bool bCurrentlyShuttingDown;
